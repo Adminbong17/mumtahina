@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDbAsync, getDb, updateProfileAsync } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     return NextResponse.json({ profile: db.profile });
   } catch (error) {
     console.error("Error fetching profile:", error);
@@ -16,9 +16,9 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const db = getDb();
+    const db = await getDbAsync();
 
-    db.profile = {
+    const updatedProfile = {
       ...db.profile,
       ...body,
       measurements: {
@@ -39,8 +39,8 @@ export async function PUT(request: Request) {
       }
     };
 
-    saveDb(db);
-    return NextResponse.json({ success: true, message: "Profile updated successfully", profile: db.profile });
+    await updateProfileAsync(updatedProfile);
+    return NextResponse.json({ success: true, message: "Profile updated successfully", profile: updatedProfile });
   } catch (error) {
     console.error("Error updating profile:", error);
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });

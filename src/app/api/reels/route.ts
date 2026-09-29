@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDbAsync, addReelItemAsync, deleteReelItemAsync } from '@/lib/db';
 import { ReelItem } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     return NextResponse.json({ reels: db.reels || [] });
   } catch (error) {
     console.error("Failed to get reels:", error);
@@ -26,7 +26,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = getDb();
     const newReel: ReelItem = {
       id: `reel-${Date.now()}`,
       title: title.trim(),
@@ -39,12 +38,7 @@ export async function POST(request: Request) {
       caption: caption ? caption.trim() : ''
     };
 
-    if (!db.reels) {
-      db.reels = [];
-    }
-
-    db.reels.unshift(newReel);
-    saveDb(db);
+    await addReelItemAsync(newReel);
 
     return NextResponse.json({ success: true, message: "Reel added successfully", reel: newReel });
   } catch (error) {
@@ -62,13 +56,11 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Reel ID is required" }, { status: 400 });
     }
 
-    const db = getDb();
-    db.reels = (db.reels || []).filter(r => r.id !== id);
-    saveDb(db);
+    await deleteReelItemAsync(id);
 
-    return NextResponse.json({ success: true, message: "Reel deleted" });
+    return NextResponse.json({ success: true, message: "Reel deleted successfully" });
   } catch (error) {
     console.error("Error deleting reel:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete reel" }, { status: 500 });
   }
 }

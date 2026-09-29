@@ -1,10 +1,10 @@
-import { getDb } from '@/lib/db';
+import { getDbAsync } from '@/lib/db';
 import PortfolioClientHome from '@/components/PortfolioClientHome';
 
 export const dynamic = 'force-dynamic';
 
-export default function HomePage() {
-  const data = getDb();
+export default async function HomePage() {
+  const data = await getDbAsync();
 
   return (
     <PortfolioClientHome

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { addPortfolioItemAsync, updatePortfolioItemAsync, deletePortfolioItemAsync } from '@/lib/db';
 import { PortfolioItem } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = getDb();
     const newItem: PortfolioItem = {
       id: `photo-${Date.now()}`,
       title: title.trim(),
@@ -33,12 +32,7 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString()
     };
 
-    if (!db.portfolio) {
-      db.portfolio = [];
-    }
-
-    db.portfolio.unshift(newItem);
-    saveDb(db);
+    await addPortfolioItemAsync(newItem);
 
     return NextResponse.json({ success: true, message: "Photo added successfully", item: newItem });
   } catch (error) {
@@ -56,20 +50,14 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, message: "Item ID is required" }, { status: 400 });
     }
 
-    const db = getDb();
-    const index = db.portfolio.findIndex(p => p.id === id);
-    if (index === -1) {
-      return NextResponse.json({ success: false, message: "Photo not found" }, { status: 404 });
-    }
-
-    db.portfolio[index] = {
-      ...db.portfolio[index],
+    const cleanUpdates = {
       ...updates,
-      tags: Array.isArray(updates.tags) ? updates.tags : (updates.tags ? updates.tags.split(',').map((t: string) => t.trim()) : db.portfolio[index].tags)
+      tags: Array.isArray(updates.tags) ? updates.tags : (updates.tags ? updates.tags.split(',').map((t: string) => t.trim()) : undefined)
     };
 
-    saveDb(db);
-    return NextResponse.json({ success: true, message: "Photo updated successfully", item: db.portfolio[index] });
+    await updatePortfolioItemAsync(id, cleanUpdates);
+
+    return NextResponse.json({ success: true, message: "Photo updated successfully" });
   } catch (error) {
     console.error("Error updating portfolio item:", error);
     return NextResponse.json({ error: "Failed to update portfolio item" }, { status: 500 });
@@ -85,9 +73,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Photo ID is required" }, { status: 400 });
     }
 
-    const db = getDb();
-    db.portfolio = db.portfolio.filter(p => p.id !== id);
-    saveDb(db);
+    await deletePortfolioItemAsync(id);
 
     return NextResponse.json({ success: true, message: "Photo deleted successfully" });
   } catch (error) {

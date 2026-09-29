@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDbAsync, addInquiryAsync, updateInquiryStatusAsync, deleteInquiryAsync } from '@/lib/db';
 import { BookingInquiry } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     return NextResponse.json({ inquiries: db.inquiries || [] });
   } catch (error) {
     console.error("Failed to get inquiries:", error);
@@ -26,7 +26,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const db = getDb();
     const newInquiry: BookingInquiry = {
       id: `inq-${Date.now()}`,
       name: name.trim(),
@@ -41,12 +40,7 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString()
     };
 
-    if (!db.inquiries) {
-      db.inquiries = [];
-    }
-
-    db.inquiries.unshift(newInquiry);
-    saveDb(db);
+    await addInquiryAsync(newInquiry);
 
     return NextResponse.json({
       success: true,
@@ -62,15 +56,11 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const { id, status } = await request.json();
-    const db = getDb();
-
-    const item = db.inquiries.find(i => i.id === id);
-    if (!item) {
-      return NextResponse.json({ success: false, message: "Inquiry not found" }, { status: 404 });
+    if (!id || !status) {
+      return NextResponse.json({ success: false, message: "Inquiry ID and status required" }, { status: 400 });
     }
 
-    item.status = status;
-    saveDb(db);
+    await updateInquiryStatusAsync(id, status);
 
     return NextResponse.json({ success: true, message: `Inquiry marked as ${status}` });
   } catch (error) {
@@ -88,9 +78,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, message: "Inquiry ID is required" }, { status: 400 });
     }
 
-    const db = getDb();
-    db.inquiries = db.inquiries.filter(i => i.id !== id);
-    saveDb(db);
+    await deleteInquiryAsync(id);
 
     return NextResponse.json({ success: true, message: "Inquiry deleted" });
   } catch (error) {
