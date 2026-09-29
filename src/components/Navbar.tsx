@@ -2,18 +2,20 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, Lock } from 'lucide-react';
 import { ModelProfile } from '@/lib/types';
 import { InstagramIcon, FacebookIcon, YouTubeIcon, TikTokIcon } from '@/components/SocialIcons';
 
 interface NavbarProps {
-  profile: ModelProfile;
+  profile?: ModelProfile;
   onOpenBooking?: () => void;
 }
 
 export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,16 +26,21 @@ export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
   }, []);
 
   const navLinks = [
-    { label: 'HOME', href: '#home' },
-    { label: 'ABOUT', href: '#about' },
-    { label: 'PORTFOLIO', href: '#portfolio' },
-    { label: 'VIDEO', href: '#video' },
-    { label: 'EXPERIENCE', href: '#experience' },
-    { label: 'CONTACT', href: '#contact' },
+    { label: 'HOME', href: '/' },
+    { label: 'ABOUT', href: '/about' },
+    { label: 'PORTFOLIO', href: '/portfolio' },
+    { label: 'VIDEO', href: '/video' },
+    { label: 'EXPERIENCE', href: '/experience' },
+    { label: 'CONTACT', href: '/contact' },
   ];
 
+  const isLinkActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname === href || pathname?.startsWith(href + '/');
+  };
+
   const handleBookClick = (e: React.MouseEvent) => {
-    if (onOpenBooking) {
+    if (pathname === '/' && onOpenBooking) {
       e.preventDefault();
       onOpenBooking();
     }
@@ -60,17 +67,22 @@ export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
 
         {/* Center Nav Links (Desktop) */}
         <nav className="hidden lg:flex items-center space-x-7 text-[11px] uppercase tracking-[0.2em] font-medium text-zinc-300">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className={`hover:text-white transition-colors py-1 relative ${
-                link.label === 'HOME' ? 'text-white after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#dfb299]' : ''
-              }`}
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const active = isLinkActive(link.href);
+            return (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`hover:text-white transition-colors py-1 relative ${
+                  active
+                    ? 'text-white font-semibold after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#dfb299]'
+                    : 'text-zinc-300'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right Actions: Socials + Divider + Book Me Button */}
@@ -119,13 +131,13 @@ export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
           <div className="h-4 w-[1px] bg-white/20" />
 
           {/* Book Me Pill Button */}
-          <a
-            href="#contact"
+          <Link
+            href="/contact"
             onClick={handleBookClick}
             className="px-5 py-2 rounded-full bg-[#dfb299] hover:bg-[#cf9f85] text-[#111113] text-[11px] font-semibold tracking-[0.16em] uppercase transition-all duration-200 shadow-sm cursor-pointer"
           >
             BOOK ME
-          </a>
+          </Link>
 
           {/* Admin link */}
           <Link
@@ -151,21 +163,26 @@ export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[65px] bg-[#09090b]/98 backdrop-blur-xl z-50 flex flex-col justify-between p-8 border-t border-white/10 animate-in fade-in duration-200">
           <nav className="flex flex-col space-y-6 pt-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg tracking-[0.2em] font-serif-luxury uppercase text-zinc-200 hover:text-[#dfb299] transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const active = isLinkActive(link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-lg tracking-[0.2em] font-serif-luxury uppercase transition-colors ${
+                    active ? 'text-[#dfb299] font-bold' : 'text-zinc-200 hover:text-[#dfb299]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="space-y-6 pt-8 border-t border-white/10">
-            <a
-              href="#contact"
+            <Link
+              href="/contact"
               onClick={(e) => {
                 setMobileMenuOpen(false);
                 handleBookClick(e);
@@ -173,7 +190,7 @@ export default function Navbar({ profile, onOpenBooking }: NavbarProps) {
               className="block w-full py-3.5 text-center rounded-full bg-[#dfb299] text-black text-xs font-semibold tracking-[0.2em] uppercase cursor-pointer"
             >
               BOOK ME
-            </a>
+            </Link>
 
             <div className="flex items-center justify-center space-x-6 text-zinc-300 pt-2">
               <a href="https://www.instagram.com/mumtahinaaa_" target="_blank" rel="noreferrer" aria-label="Instagram">

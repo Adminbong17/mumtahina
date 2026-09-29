@@ -11,12 +11,12 @@ export default function Footer() {
   };
 
   const navLinks = [
-    { label: 'HOME', href: '#home' },
-    { label: 'ABOUT', href: '#about' },
-    { label: 'PORTFOLIO', href: '#portfolio' },
-    { label: 'VIDEO', href: '#video' },
-    { label: 'EXPERIENCE', href: '#experience' },
-    { label: 'CONTACT', href: '#contact' },
+    { label: 'HOME', href: '/' },
+    { label: 'ABOUT', href: '/about' },
+    { label: 'PORTFOLIO', href: '/portfolio' },
+    { label: 'VIDEO', href: '/video' },
+    { label: 'EXPERIENCE', href: '/experience' },
+    { label: 'CONTACT', href: '/contact' },
   ];
 
   return (
@@ -37,13 +37,13 @@ export default function Footer() {
           {/* Center Nav Links */}
           <nav className="flex flex-wrap items-center justify-center gap-6 text-[11px] uppercase tracking-[0.2em] font-medium text-zinc-400">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="hover:text-white transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
 

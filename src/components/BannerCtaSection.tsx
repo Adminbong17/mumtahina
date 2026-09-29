@@ -2,10 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 interface BannerCtaSectionProps {
-  onOpenBooking: () => void;
+  onOpenBooking?: () => void;
 }
 
 export default function BannerCtaSection({ onOpenBooking }: BannerCtaSectionProps) {
@@ -40,13 +41,23 @@ export default function BannerCtaSection({ onOpenBooking }: BannerCtaSectionProp
           </h2>
 
           <div>
-            <button
-              onClick={onOpenBooking}
-              className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#dfb299] hover:bg-[#cf9f85] text-[#111113] text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-200 shadow-xl cursor-pointer"
-            >
-              <span>BOOK MUMTAHINA</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {onOpenBooking ? (
+              <button
+                onClick={onOpenBooking}
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#dfb299] hover:bg-[#cf9f85] text-[#111113] text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-200 shadow-xl cursor-pointer"
+              >
+                <span>BOOK MUMTAHINA</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-[#dfb299] hover:bg-[#cf9f85] text-[#111113] text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-200 shadow-xl cursor-pointer"
+              >
+                <span>BOOK MUMTAHINA</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
