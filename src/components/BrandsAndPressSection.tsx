@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Quote, ExternalLink } from 'lucide-react';
 import { BrandPartner, PressFeature } from '@/lib/types';
 
 interface BrandsAndPressSectionProps {
@@ -10,80 +9,88 @@ interface BrandsAndPressSectionProps {
 }
 
 export default function BrandsAndPressSection({ brands, press }: BrandsAndPressSectionProps) {
+  // Exact brands from the mockup
+  const brandList = [
+    { name: 'SAMSUNG', fontStyle: 'font-sans font-black tracking-[0.18em]' },
+    { name: 'oppo', fontStyle: 'font-sans font-bold lowercase tracking-wider' },
+    { name: 'LUX', fontStyle: 'font-serif tracking-[0.25em] font-normal text-2xl' },
+    { name: 'NIOR', fontStyle: 'font-sans font-bold tracking-[0.2em]' },
+    { name: 'Aarong', fontStyle: 'font-serif italic font-medium tracking-wide' },
+    { name: 'bKash', fontStyle: 'font-sans font-bold tracking-tight' },
+    { name: 'Daraz', fontStyle: 'font-sans font-extrabold tracking-tight' },
+    { name: 'PANTENE', fontStyle: 'font-sans font-medium tracking-[0.18em]' },
+  ];
+
+  // Exact career timeline from the mockup
+  const experiences = [
+    { year: '2024', title: 'Brand Campaign', subtitle: 'Beauty & Lifestyle' },
+    { year: '2023', title: 'Fashion Photoshoot', subtitle: 'Editorial' },
+    { year: '2023', title: 'Commercial Shoot', subtitle: 'E-commerce Brand' },
+    { year: '2022', title: 'Event Appearance', subtitle: 'Fashion Show' },
+    { year: '2021', title: 'Brand Collaboration', subtitle: 'Social Media Campaign' },
+  ];
+
   return (
-    <section id="brands" className="py-24 bg-[#0d0d11] relative border-t border-white/5">
+    <section id="experience" className="bg-[#f8f8f9] text-[#111113] py-20 border-t border-zinc-200">
       <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-20">
-        {/* Brand Collaborations Banner */}
-        <div className="space-y-8 text-center">
-          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-400 font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Select Brand Collaborations</span>
+        
+        {/* Top: Brands I've Worked With */}
+        <div className="space-y-10">
+          <div className="flex items-center space-x-3 text-xs tracking-[0.24em] uppercase text-zinc-500 font-semibold">
+            <span>BRANDS I&apos;VE WORKED WITH</span>
+            <span className="w-12 h-[1px] bg-zinc-300" />
           </div>
 
-          <h3 className="font-serif-luxury text-3xl md:text-4xl text-white font-light uppercase tracking-wider">
-            Trusted By Premier Fashion Houses
-          </h3>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 pt-6">
-            {brands.map((brand) => (
+          {/* 8-Column / Responsive Brands Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6 sm:gap-8 items-center justify-items-center py-4 border-y border-zinc-200/80">
+            {brandList.map((brand) => (
               <div
-                key={brand.id}
-                className="group p-6 bg-[#141418] border border-white/5 rounded-xl hover:border-amber-400/40 hover:bg-[#181820] transition-all duration-300 flex flex-col items-center justify-center min-h-[110px]"
+                key={brand.name}
+                className="w-full flex items-center justify-center p-3 text-zinc-800 hover:text-black transition-transform duration-200 hover:scale-105 select-none"
               >
-                <span className="font-serif-luxury text-xl md:text-2xl text-zinc-300 group-hover:text-amber-200 tracking-[0.2em] font-medium transition-colors">
-                  {brand.logoText}
-                </span>
-                <span className="text-[10px] uppercase tracking-widest text-zinc-500 mt-1 font-mono">
-                  {brand.category}
+                <span className={`text-base sm:text-lg opacity-85 hover:opacity-100 ${brand.fontStyle}`}>
+                  {brand.name}
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Press & Editorial Features */}
-        <div className="space-y-12">
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-400 font-medium">
-              <Quote className="w-3.5 h-3.5" />
-              <span>Press & Publications</span>
-            </div>
-            <h3 className="font-serif-luxury text-3xl md:text-4xl text-white font-light uppercase tracking-wider">
-              Critical Acclaim
-            </h3>
+        {/* Bottom: Experience Timeline */}
+        <div className="space-y-10 max-w-3xl">
+          <div className="flex items-center space-x-3 text-xs tracking-[0.24em] uppercase text-zinc-500 font-semibold">
+            <span>EXPERIENCE</span>
+            <span className="w-12 h-[1px] bg-zinc-300" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {press.map((item) => (
-              <div
-                key={item.id}
-                className="bg-[#121216] border border-white/10 rounded-2xl p-8 flex flex-col justify-between hover:border-amber-400/30 transition-all duration-300 relative group"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-xs text-amber-400 font-mono tracking-wider">
-                    <span>{item.publication}</span>
-                    <span className="text-zinc-500 text-[11px]">{item.date}</span>
-                  </div>
+          {/* Minimalist Vertical Timeline */}
+          <div className="relative pl-6 sm:pl-8 border-l border-zinc-300 space-y-8">
+            {experiences.map((exp, idx) => (
+              <div key={idx} className="relative group">
+                {/* Timeline Dot */}
+                <span className="absolute -left-[31px] sm:-left-[39px] top-1.5 w-3 h-3 rounded-full bg-[#111113] border-2 border-white shadow-sm" />
 
-                  <h4 className="font-serif-luxury text-lg text-white font-medium group-hover:text-amber-200 transition-colors">
-                    {item.title}
-                  </h4>
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-6">
+                  {/* Year */}
+                  <span className="font-mono text-sm sm:text-base font-semibold text-zinc-900 tracking-wider w-16">
+                    {exp.year}
+                  </span>
 
-                  {item.quote && (
-                    <p className="text-zinc-400 text-sm leading-relaxed font-light italic">
-                      &ldquo;{item.quote}&rdquo;
+                  {/* Title & Subtitle */}
+                  <div>
+                    <h4 className="font-serif-luxury text-lg sm:text-xl font-medium text-[#111113] leading-snug">
+                      {exp.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-zinc-500 font-light">
+                      {exp.subtitle}
                     </p>
-                  )}
-                </div>
-
-                <div className="pt-6 border-t border-white/5 mt-6 flex items-center justify-between text-xs text-zinc-500">
-                  <span>Fashion Editorial Review</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover:text-amber-300 transition-colors" />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </section>
   );

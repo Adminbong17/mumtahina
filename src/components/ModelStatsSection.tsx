@@ -36,8 +36,10 @@ export default function ModelStatsSection({
     window.print();
   };
 
+  if (!compCardOpen) return null;
+
   return (
-    <section id="measurements" className="py-24 bg-[#0d0d11] relative border-y border-white/5">
+    <>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Model Visual Showcase */}
@@ -273,6 +275,6 @@ export default function ModelStatsSection({
           </div>
         </div>
       )}
-    </section>
+    </>
   );
 }

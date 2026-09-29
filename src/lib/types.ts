@@ -17,6 +17,8 @@ export interface SocialLinks {
   whatsapp: string;
 }
 
+export type ContactInfo = ModelProfile['contact'];
+
 export interface ModelProfile {
   name: string;
   subtitle: string;

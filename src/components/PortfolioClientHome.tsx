@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import { ModelProfile, PortfolioItem, BrandPartner, PressFeature, ReelItem } from '@/lib/types';
 import Navbar from './Navbar';
 import HeroSection from './HeroSection';
+import AboutSection from './AboutSection';
 import PortfolioGallery from './PortfolioGallery';
 import ReelsSection from './ReelsSection';
-import ModelStatsSection from './ModelStatsSection';
-import AboutSection from './AboutSection';
 import BrandsAndPressSection from './BrandsAndPressSection';
+import BannerCtaSection from './BannerCtaSection';
 import BookingContactSection from './BookingContactSection';
 import Footer from './Footer';
+import ModelStatsSection from './ModelStatsSection';
 
 interface PortfolioClientHomeProps {
   initialProfile: ModelProfile;
@@ -34,46 +35,64 @@ export default function PortfolioClientHome({
   const [press] = useState<PressFeature[]>(initialPress);
   const [compCardOpen, setCompCardOpen] = useState(false);
 
+  const scrollToContact = () => {
+    const el = document.getElementById('contact');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[#0a0a0c] text-white flex flex-col font-sans selection:bg-[#dfb299]/30 selection:text-[#dfb299]">
+      {/* 1. Navbar */}
       <Navbar
         profile={profile}
-        onOpenCompCard={() => setCompCardOpen(true)}
+        onOpenBooking={scrollToContact}
       />
 
-      {/* Hero Showcase */}
+      {/* 2. Hero Section */}
       <HeroSection
         profile={profile}
         portfolio={portfolio}
-        onOpenCompCard={() => setCompCardOpen(true)}
+        onOpenBooking={scrollToContact}
       />
 
-      {/* Model Specifications & Comp Card */}
-      <ModelStatsSection
+      {/* 3. About Me Section (Cream background with Specs and Signature) */}
+      <AboutSection
         profile={profile}
-        compCardOpen={compCardOpen}
-        onCloseCompCard={() => setCompCardOpen(false)}
         onOpenCompCard={() => setCompCardOpen(true)}
       />
 
-      {/* Editorial Lookbook & Campaigns Gallery */}
-      <PortfolioGallery items={portfolio} />
+      {/* 4. Portfolio Section (5-column gallery with filter tabs) */}
+      <PortfolioGallery portfolio={portfolio} />
 
-      {/* Viral Reels & Video Feeds */}
-      {reels.length > 0 && <ReelsSection reels={reels} />}
+      {/* 5. Behind The Scenes Video Section */}
+      <ReelsSection reels={reels} />
 
-      {/* Editorial Career Narrative & Highlights */}
-      <AboutSection profile={profile} />
-
-      {/* Brand Collaborations & Press Features */}
+      {/* 6. Brands I've Worked With & Experience Timeline */}
       <BrandsAndPressSection brands={brands} press={press} />
 
-      {/* Casting & Booking Inquiries */}
-      <BookingContactSection profile={profile} />
+      {/* 7. Banner CTA (Let's Create Something Beautiful Together) */}
+      <BannerCtaSection onOpenBooking={scrollToContact} />
 
-      {/* Footer */}
-      <Footer profile={profile} />
+      {/* 8. Contact Me & Booking Inquiries */}
+      <BookingContactSection
+        contact={profile.contact}
+        socials={profile.socials}
+      />
+
+      {/* 9. Footer */}
+      <Footer />
+
+      {/* 10. Printable Agency Comp Card Modal */}
+      {compCardOpen && (
+        <ModelStatsSection
+          profile={profile}
+          compCardOpen={compCardOpen}
+          onCloseCompCard={() => setCompCardOpen(false)}
+          onOpenCompCard={() => setCompCardOpen(true)}
+        />
+      )}
     </div>
   );
 }

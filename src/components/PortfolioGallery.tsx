@@ -2,273 +2,191 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Sparkles, X, ChevronLeft, ChevronRight, Camera, Tag, Calendar, MapPin, ExternalLink } from 'lucide-react';
-import { PortfolioItem, Category } from '@/lib/types';
+import { ArrowRight, X, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { PortfolioItem } from '@/lib/types';
 
 interface PortfolioGalleryProps {
-  items: PortfolioItem[];
+  portfolio: PortfolioItem[];
 }
 
-const CATEGORIES: { label: string; value: 'all' | Category }[] = [
-  { label: 'All Works', value: 'all' },
-  { label: 'Bridal & Jamdani', value: 'bridal' },
-  { label: 'High Fashion Editorial', value: 'editorial' },
-  { label: 'Commercial & Brands', value: 'commercial' },
-  { label: 'Runway & Catwalk', value: 'runway' },
-  { label: 'Beauty & Portraits', value: 'beauty' },
-];
+export default function PortfolioGallery({ portfolio }: PortfolioGalleryProps) {
+  const [activeCategory, setActiveCategory] = useState<string>('ALL');
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-export default function PortfolioGallery({ items }: PortfolioGalleryProps) {
-  const [activeCategory, setActiveCategory] = useState<'all' | Category>('all');
-  const [selectedPhoto, setSelectedPhoto] = useState<PortfolioItem | null>(null);
+  const categories = ['ALL', 'FASHION', 'BEAUTY', 'COMMERCIAL', 'EDITORIAL', 'LIFESTYLE'];
 
-  const filteredItems = activeCategory === 'all'
-    ? items
-    : items.filter(item => item.category === activeCategory);
+  // Default mockup photos
+  const mockupPhotos = [
+    {
+      id: 'p1',
+      title: 'Black Velvet Noir',
+      category: 'fashion',
+      imageUrl: '/uploads/mumtahina_portfolio_1.jpg',
+      aspectRatio: 'tall',
+    },
+    {
+      id: 'p2',
+      title: 'Blush Silk Drape',
+      category: 'beauty',
+      imageUrl: '/uploads/mumtahina_portfolio_2.jpg',
+      aspectRatio: 'tall',
+    },
+    {
+      id: 'p3',
+      title: 'Midnight Jamdani Elegance',
+      category: 'editorial',
+      imageUrl: '/uploads/mumtahina_portfolio_3.jpg',
+      aspectRatio: 'tall',
+    },
+    {
+      id: 'p4',
+      title: 'White Muslin Serenity',
+      category: 'lifestyle',
+      imageUrl: '/uploads/mumtahina_portfolio_4.jpg',
+      aspectRatio: 'tall',
+    },
+    {
+      id: 'p5',
+      title: 'Crimson Lace Couture',
+      category: 'commercial',
+      imageUrl: '/uploads/mumtahina_portfolio_5.jpg',
+      aspectRatio: 'tall',
+    },
+  ];
 
-  const selectedIndex = selectedPhoto ? filteredItems.findIndex(i => i.id === selectedPhoto.id) : -1;
+  // Merge with custom portfolio items from database if available
+  const displayPhotos = (portfolio && portfolio.length >= 5)
+    ? portfolio.slice(0, 10)
+    : mockupPhotos;
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedIndex > 0) {
-      setSelectedPhoto(filteredItems[selectedIndex - 1]);
-    } else {
-      setSelectedPhoto(filteredItems[filteredItems.length - 1]);
-    }
-  };
+  const filteredPhotos = activeCategory === 'ALL'
+    ? displayPhotos
+    : displayPhotos.filter(p => p.category.toLowerCase() === activeCategory.toLowerCase());
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedIndex < filteredItems.length - 1) {
-      setSelectedPhoto(filteredItems[selectedIndex + 1]);
-    } else {
-      setSelectedPhoto(filteredItems[0]);
-    }
-  };
+  const currentLightboxPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null;
 
   return (
-    <section id="portfolio" className="py-24 bg-[#09090b] relative">
+    <section id="portfolio" className="py-24 bg-[#0a0a0c] text-white relative">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-amber-400 font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Curated Portfolio</span>
+        {/* Header Bar */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-12 border-b border-white/10">
+          {/* Left Title */}
+          <div className="flex items-center space-x-3">
+            <h2 className="font-serif-luxury text-2xl sm:text-3xl lg:text-4xl font-normal tracking-[0.1em] uppercase">
+              PORTFOLIO
+            </h2>
+            <span className="w-12 h-[1px] bg-white/30 hidden sm:block" />
           </div>
-          <h2 className="font-serif-luxury text-4xl md:text-5xl lg:text-6xl text-white font-light tracking-wide uppercase">
-            Lookbook & Campaigns
-          </h2>
-          <p className="text-zinc-400 text-sm md:text-base font-light leading-relaxed">
-            From majestic Jamdani sarees and couture runway shows to international editorial spreads.
-          </p>
+
+          {/* Center Category Filters */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-[0.2em] font-medium text-zinc-400">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`py-1 transition-colors relative cursor-pointer ${
+                  activeCategory === cat
+                    ? 'text-white font-semibold after:content-[""] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-white'
+                    : 'hover:text-zinc-200'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Right: View All */}
+          <a
+            href="#portfolio"
+            onClick={() => setActiveCategory('ALL')}
+            className="hidden lg:inline-flex items-center gap-1.5 text-xs tracking-[0.2em] uppercase font-medium text-zinc-400 hover:text-white transition-colors"
+          >
+            <span>VIEW ALL</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
-        {/* Filter Navigation */}
-        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-14">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setActiveCategory(cat.value)}
-              className={`px-5 py-2.5 rounded-full text-xs uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer ${
-                activeCategory === cat.value
-                  ? 'bg-amber-400 text-black font-semibold shadow-lg shadow-amber-500/20'
-                  : 'bg-[#141418] text-zinc-400 hover:text-white hover:bg-zinc-800 border border-white/5'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Photos Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {filteredItems.map((item) => (
+        {/* 5-Column Grid (as shown in desktop mockup) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 md:gap-4 pt-10">
+          {filteredPhotos.map((photo, index) => (
             <div
-              key={item.id}
-              onClick={() => setSelectedPhoto(item)}
-              className="group relative overflow-hidden rounded-xl bg-zinc-950 border border-white/10 cursor-pointer transition-all duration-500 hover:border-amber-400/40 hover:shadow-2xl hover:shadow-amber-500/10"
+              key={photo.id || index}
+              onClick={() => setLightboxIndex(index)}
+              className="group relative aspect-[3/4] overflow-hidden rounded-sm cursor-pointer bg-zinc-900 border border-white/5 shadow-lg"
             >
-              {/* Image Frame */}
-              <div className="relative aspect-[3/4] w-full overflow-hidden">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-
-                {/* Ambient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
-
-                {/* Featured Badge */}
-                {item.featured && (
-                  <div className="absolute top-4 right-4 z-10 px-2.5 py-1 rounded-full bg-amber-400/90 text-black text-[10px] uppercase font-bold tracking-widest">
-                    Featured
-                  </div>
-                )}
-
-                {/* Category Pill */}
-                <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-zinc-300 text-[10px] uppercase tracking-wider">
-                  {item.category}
-                </div>
-
-                {/* Bottom Details (Visible on hover & mobile) */}
-                <div className="absolute bottom-0 inset-x-0 p-6 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                  <p className="text-amber-300 text-xs uppercase tracking-widest font-mono mb-1">
-                    {item.client} · {item.year}
-                  </p>
-                  <h3 className="font-serif-luxury text-xl md:text-2xl text-white font-normal tracking-wide group-hover:text-amber-200 transition-colors">
-                    {item.title}
-                  </h3>
-
-                  <div className="mt-3 flex items-center justify-between text-xs text-zinc-400 border-t border-white/10 pt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="flex items-center gap-1.5">
-                      <Camera className="w-3.5 h-3.5 text-zinc-500" />
-                      {item.photographer}
-                    </span>
-                    <span className="text-amber-400 flex items-center gap-1">
-                      View Shoot <ExternalLink className="w-3 h-3" />
-                    </span>
-                  </div>
+              <Image
+                src={photo.imageUrl}
+                alt={photo.title || `Mumtahina Jahan Portfolio ${index + 1}`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                className="object-cover object-top filter brightness-[0.98] contrast-[1.02] transition-transform duration-700 ease-out group-hover:scale-108"
+              />
+              
+              {/* Hover Dark Overlay + Caption */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <span className="text-[10px] tracking-[0.2em] uppercase text-[#dfb299] font-medium">
+                  {photo.category}
+                </span>
+                <p className="font-serif-luxury text-sm text-white font-normal truncate">
+                  {photo.title}
+                </p>
+                <div className="pt-2 flex items-center text-[10px] tracking-[0.16em] uppercase text-zinc-300 gap-1">
+                  <Eye className="w-3 h-3" />
+                  <span>Enlarge</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
-        {filteredItems.length === 0 && (
-          <div className="text-center py-20 text-zinc-500">
-            No photographs found in this category yet.
-          </div>
-        )}
       </div>
 
-      {/* Lightbox Modal */}
-      {selectedPhoto && (
-        <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 animate-fadeIn"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          {/* Close button */}
+      {/* Interactive Lightbox Zoom Modal */}
+      {currentLightboxPhoto && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
           <button
-            onClick={() => setSelectedPhoto(null)}
-            className="absolute top-6 right-6 z-50 p-3 text-zinc-400 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition-all cursor-pointer"
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
             aria-label="Close Lightbox"
           >
             <X className="w-6 h-6" />
           </button>
 
-          {/* Navigation Arrows */}
-          <button
-            onClick={handlePrev}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 p-3 text-zinc-400 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition-all cursor-pointer"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="w-7 h-7" />
-          </button>
+          {lightboxIndex !== null && lightboxIndex > 0 && (
+            <button
+              onClick={() => setLightboxIndex(lightboxIndex - 1)}
+              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label="Previous Photo"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
 
-          <button
-            onClick={handleNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 p-3 text-zinc-400 hover:text-white bg-white/10 rounded-full hover:bg-white/20 transition-all cursor-pointer"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-7 h-7" />
-          </button>
+          {lightboxIndex !== null && lightboxIndex < filteredPhotos.length - 1 && (
+            <button
+              onClick={() => setLightboxIndex(lightboxIndex + 1)}
+              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label="Next Photo"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
 
-          {/* Modal Container */}
-          <div
-            className="relative max-w-5xl w-full max-h-[90vh] bg-[#121216] border border-white/15 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Image Preview Box */}
-            <div className="relative w-full md:w-3/5 h-[45vh] md:h-[80vh] bg-black">
+          <div className="max-w-4xl max-h-[85vh] w-full flex flex-col items-center">
+            <div className="relative w-full aspect-[3/4] max-h-[75vh]">
               <Image
-                src={selectedPhoto.imageUrl}
-                alt={selectedPhoto.title}
+                src={currentLightboxPhoto.imageUrl}
+                alt={currentLightboxPhoto.title}
                 fill
-                priority
-                sizes="(max-width: 768px) 100vw, 60vw"
-                className="object-contain p-2"
+                className="object-contain"
               />
             </div>
-
-            {/* Shoot Metadata Box */}
-            <div className="w-full md:w-2/5 p-6 md:p-8 flex flex-col justify-between overflow-y-auto max-h-[45vh] md:max-h-[80vh]">
-              <div className="space-y-6">
-                <div>
-                  <span className="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-[10px] uppercase tracking-widest font-mono mb-2">
-                    {selectedPhoto.category}
-                  </span>
-                  <h3 className="font-serif-luxury text-2xl md:text-3xl text-white font-light tracking-wide">
-                    {selectedPhoto.title}
-                  </h3>
-                </div>
-
-                {selectedPhoto.description && (
-                  <p className="text-zinc-300 text-sm leading-relaxed font-light">
-                    {selectedPhoto.description}
-                  </p>
-                )}
-
-                {/* Details Breakdown */}
-                <div className="space-y-3 pt-4 border-t border-white/10 text-xs">
-                  <div className="flex items-center justify-between text-zinc-400">
-                    <span className="flex items-center gap-2">
-                      <Tag className="w-3.5 h-3.5 text-amber-400" /> Client / Brand
-                    </span>
-                    <span className="text-zinc-200 font-medium">{selectedPhoto.client}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-zinc-400">
-                    <span className="flex items-center gap-2">
-                      <Camera className="w-3.5 h-3.5 text-amber-400" /> Photographer
-                    </span>
-                    <span className="text-zinc-200 font-medium">{selectedPhoto.photographer}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-zinc-400">
-                    <span className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-amber-400" /> Release Year
-                    </span>
-                    <span className="text-zinc-200 font-medium">{selectedPhoto.year}</span>
-                  </div>
-
-                  {selectedPhoto.location && (
-                    <div className="flex items-center justify-between text-zinc-400">
-                      <span className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-amber-400" /> Location
-                      </span>
-                      <span className="text-zinc-200 font-medium">{selectedPhoto.location}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Tags */}
-                {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
-                  <div className="pt-2">
-                    <span className="text-[10px] uppercase tracking-widest text-zinc-500 block mb-2">Tags</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {selectedPhoto.tags.map((tag, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded bg-white/5 text-zinc-400 text-[11px]">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Action in Lightbox */}
-              <div className="pt-6 border-t border-white/10 mt-6">
-                <a
-                  href="#contact"
-                  onClick={() => setSelectedPhoto(null)}
-                  className="w-full block text-center py-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs uppercase tracking-[0.2em] rounded-lg transition-colors shadow-lg"
-                >
-                  Book Mumtahina For Shoot
-                </a>
-              </div>
+            <div className="text-center pt-4">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#dfb299]">
+                {currentLightboxPhoto.category}
+              </span>
+              <h3 className="font-serif-luxury text-xl sm:text-2xl text-white font-normal">
+                {currentLightboxPhoto.title}
+              </h3>
             </div>
           </div>
         </div>
