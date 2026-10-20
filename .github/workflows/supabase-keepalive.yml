@@ -1,0 +1,26 @@
+name: Supabase Keep Alive (Anti-Pause)
+
+on:
+  schedule:
+    # Runs every 3 days at 00:00 UTC (well within Supabase's 7-day inactivity pause limit)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions dashboard
+
+jobs:
+  keep-alive:
+    name: Ping Supabase Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Heartbeat to Website Cron Endpoint
+        run: |
+          echo "Sending keep-alive ping to website cron endpoint..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" "https://mumtahina.bongbangla.top/api/cron/keep-alive" || true)
+          echo "$RESPONSE"
+
+      - name: Direct Fallback Ping to Supabase REST API
+        run: |
+          echo "Pinging Supabase REST API directly..."
+          curl -s -X GET \
+            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3Z1cmZucW1rY2ZiZGJnY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODUwOTIsImV4cCI6MjEwNjI2MTA5Mn0.j1xFsqLsFDwf1miq620kqYwCNpdaLSpbHxK3bvf6rrk' }}" \
+            -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdlb3Z1cmZucW1rY2ZiZGJnY2RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2ODUwOTIsImV4cCI6MjEwNjI2MTA5Mn0.j1xFsqLsFDwf1miq620kqYwCNpdaLSpbHxK3bvf6rrk' }}" \
+            "https://geovurfnqmkcfbdbgcdk.supabase.co/rest/v1/" || echo "Direct ping attempt finished"
