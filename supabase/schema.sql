@@ -878,3 +878,24 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.admin_settings (key, value)
 VALUES ('admin_credentials', '{"username": "admin", "passwordHash": "mumtahina2026", "lastLogin": "2026-09-29T10:25:19.143Z"}'::jsonb)
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+
+
+-- 8. Keep-Alive Logs Table (Anti-Pause Protection)
+CREATE TABLE IF NOT EXISTS public.keep_alive_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pinged_at TIMESTAMPTZ DEFAULT NOW(),
+  source TEXT DEFAULT 'automated_cron',
+  message TEXT DEFAULT 'Keep-alive ping to prevent Supabase inactivity pause'
+);
+
+ALTER TABLE public.keep_alive_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public insert on keep_alive_logs"
+  ON public.keep_alive_logs FOR INSERT
+  TO anon, authenticated, service_role
+  WITH CHECK (true);
+
+CREATE POLICY "Allow read on keep_alive_logs"
+  ON public.keep_alive_logs FOR SELECT
+  TO anon, authenticated, service_role
+  USING (true);
